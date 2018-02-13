@@ -1,30 +1,55 @@
-import _ from 'lodash';
+import { find, identity } from 'lodash'; // eslint-disable-line
 
-const buildHtml = (tag) => {
-  if (tag instanceof Array != true) return '';
+const singleTagsList = new Set(['hr', 'img', 'br']);
 
-	const [ name, ...rest ] = tag;
+const parseDispatcher = [
+  {
+    name: 'body', 
+    check: v => typeof v === 'string',
+    toAst: (acc, value) => ({ ...acc, 'body': value })
+  }, 
+  {
+    name: 'children', 
+    check: v => v instanceof Array,
+    toAst: (acc, value) => ({ ...acc, 'children': value.map(data => parse(data)) })
+  },
+  {
+    name: 'attribute', 
+    check: v => v instanceof Object,
+    toAst: (acc, value) => ({ ...acc, 'attributes': value })
+  }
+];
 
-	const { attributes, children, body } = rest.reduce( (acc, value) => {
-		// Children
-		if (value instanceof Object && value instanceof Array) {
-			return { ...acc, 'children': value.reduce( (cAcc, cTag) => cAcc + buildHtml(cTag), '') };			
-		}
-		// Attributes
-		if (value instanceof Object) {
-			const output = Object.keys(value).reduce( (aAcc, key) => {
-				return aAcc + ` ${key}="${value[key]}"`;
-			}, '');
-			return { ...acc, 'attributes': output };
-		}
-		// Body
-		if (typeof value === 'string') {
-			return { ...acc, 'body': value };
-		}
-		return acc; 
-	}, {} );
+export const parse = (data) => {
 
-	return `<${name}${attributes || ''}>${children || ''}${body || ''}</${name}>`;
-}
+  const [ name, ...rest ] = data;
 
-export default buildHtml;
+  const ast = { 
+    'name': name,
+    'attributes': {},
+    'body': '',
+    'children': [],
+    ...rest.reduce((acc, value) => 
+      parseDispatcher
+      .find(obj => obj.check(value))
+      .toAst(acc, value)  , {})
+  };
+
+  return ast;
+};
+
+export const render = (ast) => {
+  const { name, attributes } = ast;
+
+  const newAttributes = Object.keys(attributes).map(key => ` ${key}="${attributes[key]}"`).join('');
+
+  if (singleTagsList.has(name)) return `<${name}${newAttributes}>`;
+
+  const { body, children } = ast;
+
+  const newChildren = children.reduce((acc, value) => acc + render(value), '');
+  
+  return `<${name}${newAttributes}>${newChildren}${body}</${name}>`;
+};
+
+
