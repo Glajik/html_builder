@@ -1,15 +1,10 @@
-export default class PairedTag {
+import Node from './Node';
+
+export default class extends Node {
   constructor(name, attributes = {}, body = '', children = []) {
-    this.name = name;
-    this.attributes = attributes;
+    super(name, attributes);
     this.body = body;
     this.children = children;
-  }
-
-  attributesString() {
-    return Object.keys(this.attributes).map(key =>
-      ` ${key}="${this.attributes[key]}"`)
-      .join('');
   }
 
   childrenString() {

@@ -3,12 +3,7 @@ import SingleTag from './SingleTag';
 
 const singleTagsList = new Set(['hr', 'img', 'br']);
 
-const buildNode = (name, attributes, body, children) => {
-  if (singleTagsList.has(name)) {
-    return new SingleTag(name, attributes);
-  }
-
-  return new PairedTag(name, attributes, body, children);
+export default (name, ...args) => {
+  const C = singleTagsList.has(name) ? SingleTag : PairedTag;
+  return new C(name, ...args);
 };
-
-export default buildNode;
