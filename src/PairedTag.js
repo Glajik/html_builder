@@ -1,21 +1,20 @@
 import Node from './Node';
 
-export default class extends Node {
-  constructor(name, attributes = {}, body = '', children = []) {
-    super(name, attributes);
-    this.body = body;
-    this.children = children;
-  }
+function childrenString(children) {
+  return children.reduce((acc, el) =>
+    acc + el.toString(), '');
+}
 
-  childrenString() {
-    return this.children.reduce((acc, el) =>
-      acc + el.toString(), '');
-  }
+function toString() {
+  const { name, body } = this;
+  const attributes = this.getAttributes();
+  const children = childrenString(this.children);
+  return `<${name}${attributes}>${children}${body}</${name}>`;
+}
 
-  toString() {
-    const { name, body } = this;
-    const attributes = this.attributesString();
-    const children = this.childrenString();
-    return `<${name}${attributes}>${children}${body}</${name}>`;
-  }
+export default function PairedTag(name, attributes, body, children) {
+  Node.apply(this, [name, attributes]);
+  this.body = body || '';
+  this.children = children || [];
+  this.toString = toString;
 }

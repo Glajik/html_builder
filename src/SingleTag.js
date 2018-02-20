@@ -1,14 +1,13 @@
 import Node from './Node';
 
-export default class extends Node {
-  constructor(name, attributes = {}) {
-    super(name, attributes);
-  }
+function toString() {
+  const { name } = this;
+  const attributes = this.getAttributes();
+  return `<${name}${attributes}>`;
+}
 
-  toString() {
-    const { name } = this;
-    const attributes = this.attributesString();
-    return `<${name}${attributes}>`;
-  }
+export default function SingleTag(name, attributes) {
+  Node.apply(this, [name, attributes]);
+  this.toString = toString;
 }
 
