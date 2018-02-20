@@ -1,16 +1,10 @@
-function getAttributes() {
-  return Object.keys(this.attributes).map(key =>
-    ` ${key}="${this.attributes[key]}"`)
-    .join('');
+function getAttributesAsLine() {
+  return Object.keys(this.attributes).reduce((acc, key) =>
+    `${acc} ${key}="${this.attributes[key]}"`, '');
 }
 
-function toString() {
-  return this.name.toString();
-}
-
-export default function Node(name, attributes) {
+export default function Node(name, attributes = {}) {
   this.name = name;
-  this.attributes = attributes || {};
-  this.getAttributes = getAttributes;
-  this.toString = toString;
+  this.attributes = attributes;
+  this.getAttributesAsLine = getAttributesAsLine;
 }
