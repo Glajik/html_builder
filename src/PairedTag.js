@@ -6,13 +6,10 @@ export default function PairedTag(name, attributes = {}, body = '', children = [
   this.children = children;
 }
 
-const childrenString = children =>
-  children.reduce((acc, el) =>
-    acc + el.toString(), '');
+PairedTag.prototype = Object.create(Node.prototype);
 
 PairedTag.prototype.toString = function toString() {
-  const { name, body } = this;
-  const attributes = this.getAttributesAsLine();
-  const children = childrenString(this.children);
-  return `<${name}${attributes}>${children}${body}</${name}>`;
-}
+  const value = this.children.length > 0 ?
+    this.children.map(child => child.toString()).join('') : this.body;
+  return `<${this.name}${this.getAttributesAsLine()}>${value}</${this.name}>`;
+};
